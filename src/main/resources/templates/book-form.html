@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dodaj Książkę</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/templates/style.css">
+
+</head>
+<body class="container">
+
+<h1>📘 Dodaj nową książkę</h1>
+
+
+<a href="/books">Szukaj książki</a>
+<a href="/books/new">Dodaj książki</a>
+<a href="/wyswietl-przedmioty">Przedmioty</a>
+<a href="/dodaj-przedmiot">Dodaj przedmioty</a>
+<!-- 🧠 Explanation Panel -->
+<div class="alert alert-info">
+    <h5>🔍 Jak to działa</h5>
+    <p>
+        Ta strona wysyła request <code>POST</code> do <code>/books</code> który jest rozwiązywany przez metodę <code>BookController.save()</code>.
+        Książka jest przekazywana do <code>bookService.save(book)</code> który używa metodę <code>save()</code> od Spring Data JPA, by przesłać ją do bazy danych przez Hibernate.
+    </p>
+</div>
+
+
+
+<!-- 📝 Form -->
+<form th:action="@{/books}" method="post" th:object="${book}" class="mb-3">
+    <div class="mb-2">
+        <label>Title</label>
+        <input th:field="*{title}" class="form-control"/>
+    </div>
+    <div class="mb-2">
+        <label>Author</label>
+        <input th:field="*{author}" class="form-control"/>
+    </div>
+    <div class="mb-2">
+        <label>Publication Year</label>
+        <input th:field="*{publicationYear}" type="number" class="form-control"/>
+    </div>
+    <button type="submit" class="btn btn-success">Save Book</button>
+</form>
+
+
+</body>
+</html>

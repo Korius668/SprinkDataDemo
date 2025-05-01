@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dodaj Nowy Przedmiot</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-4">
+    <h1>Dodaj Nowy Przedmiot</h1>
+
+    <a href="/books">Szukaj książki</a>
+    <a href="/books/new">Dodaj książki</a>
+    <a href="/wyswietl-przedmioty">Przedmioty</a>
+    <a href="/dodaj-przedmiot">Dodaj przedmioty</a>
+
+    <div class="alert alert-info">
+        <h5>🔍 Jak to działa</h5>
+        <p>
+            Ta strona zbiera informacje o nowym przedmiocie, takie jak jego nazwa oraz dynamicznie dodawane cechy (nazwa cechy i jej wartość).
+            Po kliknięciu przycisku "Dodaj Przedmiot", strona wysyła żądanie <code>POST</code> na adres <code>/api/przedmioty</code>.
+            To żądanie jest obsługiwane przez metodę <code>dodajPrzedmiot()</code> w kontrolerze <code>PrzedmiotController</code>.
+            Dane przedmiotu są przekazywane do serwisu (jeśli taki istnieje) lub bezpośrednio do <code>PrzedmiotRepository</code>,
+            który używa metod Spring Data MongoDB, aby zapisać te informacje jako nowy dokument w kolekcji "przedmioty" w bazie danych MongoDB.
+        </p>
+    </div>
+
+
+    <form action="/api/przedmioty" method="post" class="row g-3">
+        <div class="col-md-6">
+            <label for="nazwa" class="form-label">Nazwa przedmiotu:</label>
+            <input type="text" class="form-control" id="nazwa" name="nazwa" required>
+        </div>
+
+        <div id="cechy-kontener" class="col-12">
+            <h2>Dodaj Cechy</h2>
+            <div id="cecha-0" class="row g-3 align-items-center mb-2 cecha">
+                <div class="col-auto">
+                    <label for="cechaKlucz-0" class="form-label">Nazwa cechy:</label>
+                </div>
+                <div class="col-md-4">
+                    <input type="text" class="form-control cecha-klucz" id="cechaKlucz-0" name="cechaKlucz-0">
+                </div>
+                <div class="col-auto">
+                    <label for="cechaWartosc-0" class="form-label">Wartość cechy:</label>
+                </div>
+                <div class="col-md-4">
+                    <input type="text" class="form-control cecha-wartosc" id="cechaWartosc-0" name="cechaWartosc-0">
+                </div>
+                <div class="col-auto">
+                    <button type="button" class="btn btn-success dodaj-ceche">+</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary">Dodaj Przedmiot</button>
+            <a href="/wyswietl-przedmioty" class="btn btn-secondary">Wyświetl Przedmi

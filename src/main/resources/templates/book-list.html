@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book List</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/templates/style.css">
+
+</head>
+<body class="container">
+
+<h1>📚 All Books</h1>
+
+<a href="/books">Szukaj książki</a>
+<a href="/books/new">Dodaj książki</a>
+<a href="/wyswietl-przedmioty">Przedmioty</a>
+<a href="/dodaj-przedmiot">Dodaj przedmioty</a>
+
+<!-- 🧠 Explanation Panel -->
+<div class="alert alert-info">
+    <h5>🔍 Jak to działa</h5>
+    <p>
+        Ta strona wypisuje wszystkie książki z użyciem <code>bookRepository.findAll()</code>. Dane pochodzą z bazy danych H2 dzięki Spring Data JPA.
+        Kiedy filtry są używane, dynamiczne kwerendy są tworzone dzięki <code>Specification</code> API.
+    </p>
+
+    <h5>Jak Korzystać z Filtrowania Książek</h5>
+    <p>
+        Na tej stronie masz możliwość filtrowania wyświetlanej listy książek przy użyciu prostego formularza wyszukiwania. Możesz zawęzić wyniki, podając autora lub rok publikacji (lub oba te kryteria jednocześnie).
+    </p>
+    <ul>
+        <li>
+            <strong>Filtrowanie po autorze:</strong>
+            <p>
+                W polu oznaczonym jako "Author" możesz wpisać fragment nazwiska lub imienia autora, którego książki Cię interesują. System wyszuka wszystkie książki, w których pole "Author" zawiera wpisany tekst (bez względu na wielkość liter). Na przykład, wpisując "Kowalski", zobaczysz wszystkie książki, których autorem jest ktoś, w którego nazwisku występuje "Kowalski".
+            </p>
+        </li>
+        <li>
+            <strong>Filtrowanie po roku publikacji:</strong>
+            <p>
+                W polu oznaczonym jako "Year" możesz wpisać rok publikacji, aby wyświetlić tylko te książki, które zostały opublikowane w tym roku lub później. Wpisz pełny rok (np. "2020").
+            </p>
+        </li>
+        <li>
+            <strong>Łączenie filtrów:</strong>
+            <p>
+                Możesz użyć obu pól jednocześnie, aby jeszcze bardziej zawęzić wyniki wyszukiwania. Na przykład, możesz wpisać "Sienkiewicz" w polu "Author" i "1900" w polu "Year", aby znaleźć wszystkie książki Sienkiewicza opublikowane w roku 1900 lub później.
+            </p>
+        </li>
+        <li>
+            <strong>Aby zastosować filtry:</strong>
+            <p>
+                Po wpisaniu żądanych kryteriów w odpowiednie pola, kliknij przycisk "Search". Lista książek zostanie zaktualizowana, wyświetlając tylko te pozycje, które spełniają Twoje kryteria.
+            </p>
+        </li>
+        <li>
+            <strong>Aby zobaczyć wszystkie książki:</strong>
+            <p>
+                Jeśli chcesz ponownie wyświetlić pełną listę wszystkich dostępnych książek, po prostu wyczyść oba pola formularza wyszukiwania (pozostaw je puste) i kliknij "Search".
+            </p>
+        </li>
+    </ul>
+</div>
+
+<!-- 🔎 Filter/Search -->
+<!--<form method="get" th:action="@{/books/search}" class="mb-4">-->
+<!--    <div class="row g-2">-->
+<!--        <div class="col">-->
+<!--            <input name="author" class="form-control" placeholder="Author"/>-->
+<!--        </div>-->
+<!--        <div class="col">-->
+<!--            <input name="publicationYear" type="number" class="form-control" placeholder="Year"/>-->
+<!--        </div>-->
+<!--        <div class="col-auto">-->
+<!--            <button class="btn btn-primary">Search</button>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</form>-->
+
+<form method="get" th:action="@{/books/search}" class="mb-4">
+    <div class="row g-2 align-items-center">
+        <div class="col">
+            <input name="author" class="form-control" placeholder="Author"/>
+        </div>
+        <div class="col">
+            <label for="publicationYearFrom" class="form-label visually-hidden">Rok od</label>
+            <input type="number" class="form-control" id="publicationYearFrom" name="publicationYearFrom" placeholder="Rok od"/>
+        </div>
+        <div class="col">
+            <label for="publicationYearTo" class="form-label visually-hidden">Rok do</label>
+            <input type="number" class="form-control" id="publicationYearTo" name="publicationYearTo" placeholder="Rok do"/>
+        </div>
+        <div class="col-auto">
+            <button class="btn btn-primary">Search</button>
+        </div>
+    </div>
+</form>
+
+<!-- 📋 Book Table -->
+<table class="table table-bordered">
+    <thead><tr><th>Title</th><th>Author</th><th>Year</th><th>Actions</th></tr></thead>
+    <tbody>
+    <tr th:each="book : ${books}">
+        <td th:text="${book.title}"></td>
+        <td th:text="${book.author}"></td>
+        <td th:text="${book.publicationYear}"></td>
+        <td>
+            <form th:action="@{'/books/delete/' + ${book.id}}" method="post">
+                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>
