@@ -13,10 +13,10 @@
 <h1>📘 Dodaj nową książkę</h1>
 
 
-<a href="/books">Szukaj książki</a>
-<a href="/books/new">Dodaj książki</a>
-<a href="/wyswietl-przedmioty">Przedmioty</a>
-<a href="/dodaj-przedmiot">Dodaj przedmioty</a>
+<a href="/books" class="btn btn-secondary">Wyszukaj książki</a>
+<a href="/books/new" class="btn btn-secondary">Dodaj książki</a>
+<a href="/wyswietl-przedmioty" class="btn btn-secondary">Przedmioty</a>
+<a href="/dodaj-przedmiot" class="btn btn-secondary">Dodaj przedmioty</a>
 <!-- 🧠 Explanation Panel -->
 <div class="alert alert-info">
     <h5>🔍 Jak to działa</h5>
@@ -26,9 +26,6 @@
     </p>
 </div>
 
-
-
-<!-- 📝 Form -->
 <form th:action="@{/books}" method="post" th:object="${book}" class="mb-3">
     <div class="mb-2">
         <label>Title</label>
@@ -42,7 +39,7 @@
         <label>Publication Year</label>
         <input th:field="*{publicationYear}" type="number" class="form-control"/>
     </div>
-    <button type="submit" class="btn btn-success">Save Book</button>
+    <button type="submit" class="btn btn-success">Dodaj książkę</button>
 </form>
 
 

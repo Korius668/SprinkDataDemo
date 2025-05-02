@@ -1,17 +1,14 @@
 package prez.prez2.controller;
 
-import prez.prez2.entity.Przedmiot;
-import prez.prez2.repository.PrzedmiotRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import prez.prez2.entity.Przedmiot;
+import prez.prez2.repository.PrzedmiotRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,27 +20,29 @@ public class PrzedmiotController {
     public PrzedmiotController(PrzedmiotRepository przedmiotRepository) {
         this.przedmiotRepository = przedmiotRepository;
     }
-
-    @PostMapping("/api/przedmioty")
+    @PostMapping("/przedmioty")
     @ResponseBody
-    public ResponseEntity<String> dodajPrzedmiot(@RequestParam Map<String, String> formParams) {
-        String nazwa = formParams.get("nazwa");
+    public ResponseEntity<Map<String, String>> dodajPrzedmiot(@RequestBody Map<String, Object> danePrzedmiotu) {
+        String nazwa = (String) danePrzedmiotu.get("nazwa");
         if (nazwa == null || nazwa.isEmpty()) {
-            return new ResponseEntity<>("Brak nazwy", HttpStatus.BAD_REQUEST);
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "Brak nazwy przedmiotu");
+            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
         }
 
         Przedmiot przedmiot = new Przedmiot(nazwa);
+        Map<String, Object> cechy = (Map<String, Object>) danePrzedmiotu.get("cechy");
+        if (cechy != null) {
+            przedmiot.setCechy(cechy);
+        }
 
-        // Collect dynamic features
-        formParams.forEach((klucz, wartosc) -> {
-            if (!klucz.equals("nazwa")) {
-                przedmiot.dodajCeche(klucz, wartosc);
-            }
-        });
-
-        przedmiotRepository.save(przedmiot);
-        return new ResponseEntity<>("Zapisano przedmiot", HttpStatus.CREATED);
+        Przedmiot zapisanyPrzedmiot = przedmiotRepository.save(przedmiot);
+        Map<String, String> result = new HashMap<>();
+        result.put("id", zapisanyPrzedmiot.getId());
+        result.put("nazwa", zapisanyPrzedmiot.getNazwa());
+        return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
+
 
     @GetMapping("/dodaj-przedmiot")
     public String pokazFormularzDodawania() {

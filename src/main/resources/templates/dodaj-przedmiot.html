@@ -6,57 +6,145 @@
     <title>Dodaj Nowy Przedmiot</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </head>
-<body>
-<div class="container mt-4">
-    <h1>Dodaj Nowy Przedmiot</h1>
+<body class="container">
+<h1>Dodaj Nowy Przedmiot</h1>
+<a href="/books" class="btn btn-secondary">Szukaj książki</a>
+<a href="/books/new" class="btn btn-secondary">Dodaj książki</a>
+<a href="/wyswietl-przedmioty" class="btn btn-secondary">Przedmioty</a>
+<a href="/dodaj-przedmiot" class="btn btn-secondary">Dodaj przedmioty</a>
 
-    <a href="/books">Szukaj książki</a>
-    <a href="/books/new">Dodaj książki</a>
-    <a href="/wyswietl-przedmioty">Przedmioty</a>
-    <a href="/dodaj-przedmiot">Dodaj przedmioty</a>
+<div class="alert alert-info">
+    <h5>🔍 Jak to działa</h5>
+    <p>
+        Ta strona zbiera informacje o nowym przedmiocie, takie jak jego nazwa oraz dynamicznie dodawane cechy (nazwa cechy i jej wartość).
+        Po kliknięciu przycisku "Dodaj Przedmiot", strona wysyła żądanie <code>POST</code> na adres <code>/przedmioty</code> jako JSON.
+        To żądanie jest obsługiwane przez metodę <code>dodajPrzedmiot()</code> w kontrolerze <code>PrzedmiotController</code>.
+        Dane przedmiotu są przekazywane do <code>PrzedmiotRepository</code>, który używa Spring Data MongoDB do zapisania.
+    </p>
+</div>
 
-    <div class="alert alert-info">
-        <h5>🔍 Jak to działa</h5>
-        <p>
-            Ta strona zbiera informacje o nowym przedmiocie, takie jak jego nazwa oraz dynamicznie dodawane cechy (nazwa cechy i jej wartość).
-            Po kliknięciu przycisku "Dodaj Przedmiot", strona wysyła żądanie <code>POST</code> na adres <code>/api/przedmioty</code>.
-            To żądanie jest obsługiwane przez metodę <code>dodajPrzedmiot()</code> w kontrolerze <code>PrzedmiotController</code>.
-            Dane przedmiotu są przekazywane do serwisu (jeśli taki istnieje) lub bezpośrednio do <code>PrzedmiotRepository</code>,
-            który używa metod Spring Data MongoDB, aby zapisać te informacje jako nowy dokument w kolekcji "przedmioty" w bazie danych MongoDB.
-        </p>
+<form id="dodajPrzedmiotForm">
+    <div class="mb-3">
+        <label for="nazwa" class="form-label">Nazwa przedmiotu:</label>
+        <input type="text" class="form-control" id="nazwa" name="nazwa" required>
     </div>
 
+    <div id="dynamiczne-cechy" class="mb-3">
+        <h2>Dodaj Cechy</h2>
+    </div>
 
-    <form action="/api/przedmioty" method="post" class="row g-3">
-        <div class="col-md-6">
-            <label for="nazwa" class="form-label">Nazwa przedmiotu:</label>
-            <input type="text" class="form-control" id="nazwa" name="nazwa" required>
-        </div>
+    <button type="button" id="dodaj-ceche" class="btn btn-info mt-2">Dodaj Cechę</button>
+    <button type="button" id="dodaj-przedmiot" class="btn btn-info mt-2">Dodaj Przedmiot</button>
 
-        <div id="cechy-kontener" class="col-12">
-            <h2>Dodaj Cechy</h2>
-            <div id="cecha-0" class="row g-3 align-items-center mb-2 cecha">
-                <div class="col-auto">
-                    <label for="cechaKlucz-0" class="form-label">Nazwa cechy:</label>
-                </div>
-                <div class="col-md-4">
-                    <input type="text" class="form-control cecha-klucz" id="cechaKlucz-0" name="cechaKlucz-0">
-                </div>
-                <div class="col-auto">
-                    <label for="cechaWartosc-0" class="form-label">Wartość cechy:</label>
-                </div>
-                <div class="col-md-4">
-                    <input type="text" class="form-control cecha-wartosc" id="cechaWartosc-0" name="cechaWartosc-0">
-                </div>
-                <div class="col-auto">
-                    <button type="button" class="btn btn-success dodaj-ceche">+</button>
-                </div>
-            </div>
-        </div>
+    <div id="wiadomosc" class="mt-2"></div>
+</form>
 
-        <div class="col-12">
-            <button type="submit" class="btn btn-primary">Dodaj Przedmiot</button>
-            <a href="/wyswietl-przedmioty" class="btn btn-secondary">Wyświetl Przedmi</a>
-        </div>
-    </form>
-</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const cechyKontener = document.getElementById('dynamiczne-cechy');
+        const dodajCecheButton = document.getElementById('dodaj-ceche');
+        const dodajPrzedmiotButton = document.getElementById('dodaj-przedmiot');
+        const nazwaInput = document.getElementById('nazwa');
+        const wiadomoscDiv = document.getElementById('wiadomosc');
+        let licznikCech = 0;
+
+        dodajCecheButton.addEventListener('click', () => {
+            licznikCech++;
+            const divCechy = document.createElement('div');
+            divCechy.classList.add('cecha', 'mb-2', 'row', 'g-3', 'align-items-center');
+
+            const divNazwaLabel = document.createElement('div');
+            divNazwaLabel.classList.add('col-auto');
+            const labelKlucz = document.createElement('label');
+            labelKlucz.textContent = `Nazwa cechy ${licznikCech}:`;
+            divNazwaLabel.appendChild(labelKlucz);
+
+            const divNazwaInput = document.createElement('div');
+            divNazwaInput.classList.add('col-md-4');
+            const inputKlucz = document.createElement('input');
+            inputKlucz.type = 'text';
+            inputKlucz.name = `cecha_klucz_${licznikCech}`;
+            inputKlucz.classList.add('form-control');
+            divNazwaInput.appendChild(inputKlucz);
+
+            const divWartoscLabel = document.createElement('div');
+            divWartoscLabel.classList.add('col-auto');
+            const labelWartosc = document.createElement('label');
+            labelWartosc.textContent = `Wartość cechy ${licznikCech}:`;
+            divWartoscLabel.appendChild(labelWartosc);
+
+            const divWartoscInput = document.createElement('div');
+            divWartoscInput.classList.add('col-md-4');
+            const inputWartosc = document.createElement('input');
+            inputWartosc.type = 'text';
+            inputWartosc.name = `cecha_wartosc_${licznikCech}`;
+            inputWartosc.classList.add('form-control');
+            divWartoscInput.appendChild(inputWartosc);
+
+            const divUsunButton = document.createElement('div');
+            divUsunButton.classList.add('col-auto');
+            const usunButton = document.createElement('button');
+            usunButton.type = 'button';
+            usunButton.textContent = 'Usuń';
+            usunButton.classList.add('btn', 'btn-danger');
+            usunButton.addEventListener('click', () => {
+                divCechy.remove();
+            });
+            divUsunButton.appendChild(usunButton);
+
+            divCechy.appendChild(divNazwaLabel);
+            divCechy.appendChild(divNazwaInput);
+            divCechy.appendChild(divWartoscLabel);
+            divCechy.appendChild(divWartoscInput);
+            divCechy.appendChild(divUsunButton);
+
+            cechyKontener.appendChild(divCechy);
+        });
+
+        dodajPrzedmiotButton.addEventListener('click', async () => {
+            const nazwa = nazwaInput.value;
+            const cechy = {};
+            const wszystkieCechy = cechyKontener.querySelectorAll('.cecha');
+
+            wszystkieCechy.forEach(cechaDiv => {
+                const inputKlucz = cechaDiv.querySelector('input[name^="cecha_klucz_"]');
+                const inputWartosc = cechaDiv.querySelector('input[name^="cecha_wartosc_"]');
+                if (inputKlucz && inputWartosc && inputKlucz.value && inputWartosc.value) {
+                    cechy[inputKlucz.value] = inputWartosc.value;
+                }
+            });
+
+            const danePrzedmiotu = { nazwa, cechy };
+
+            try {
+                const response = await fetch('/przedmioty', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(danePrzedmiotu),
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    wiadomoscDiv.textContent = `Przedmiot "${result.nazwa}" został dodany z ID: ${result.id}`;
+                    wiadomoscDiv.className = 'alert alert-success';
+                    nazwaInput.value = '';
+                    cechyKontener.innerHTML = '';
+                    licznikCech = 0;
+                    // Przekierowanie po dodaniu
+                    window.location.href = '/wyswietl-przedmioty';
+                } else {
+                    const error = await response.json();
+                    wiadomoscDiv.textContent = `Błąd podczas dodawania przedmiotu: ${error.message || response.statusText}`;
+                    wiadomoscDiv.className = 'alert alert-danger';
+                }
+            } catch (error) {
+                wiadomoscDiv.textContent = `Wystąpił błąd sieci: ${error}`;
+                wiadomoscDiv.className = 'alert alert-danger';
+            }
+        });
+    });
+</script>
+</body>
+</html>
