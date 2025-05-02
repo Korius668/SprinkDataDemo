@@ -26,22 +26,23 @@ public class PrzedmiotController {
 
     @PostMapping("/api/przedmioty")
     @ResponseBody
-    public ResponseEntity<Przedmiot> dodajPrzedmiot(@RequestBody Map<String, Object> danePrzedmiotu) {
-        if (!danePrzedmiotu.containsKey("nazwa")) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    public ResponseEntity<String> dodajPrzedmiot(@RequestParam Map<String, String> formParams) {
+        String nazwa = formParams.get("nazwa");
+        if (nazwa == null || nazwa.isEmpty()) {
+            return new ResponseEntity<>("Brak nazwy", HttpStatus.BAD_REQUEST);
         }
 
-        String nazwa = (String) danePrzedmiotu.get("nazwa");
         Przedmiot przedmiot = new Przedmiot(nazwa);
 
-        danePrzedmiotu.forEach((klucz, wartosc) -> {
+        // Collect dynamic features
+        formParams.forEach((klucz, wartosc) -> {
             if (!klucz.equals("nazwa")) {
                 przedmiot.dodajCeche(klucz, wartosc);
             }
         });
 
-        Przedmiot zapisanyPrzedmiot = przedmiotRepository.save(przedmiot);
-        return new ResponseEntity<>(zapisanyPrzedmiot, HttpStatus.CREATED);
+        przedmiotRepository.save(przedmiot);
+        return new ResponseEntity<>("Zapisano przedmiot", HttpStatus.CREATED);
     }
 
     @GetMapping("/dodaj-przedmiot")
