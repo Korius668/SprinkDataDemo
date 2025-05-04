@@ -7,10 +7,12 @@ import prez.prez2.entity.Przedmiot;
 import prez.prez2.repository.PrzedmiotRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.lang.Nullable;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 
 @Controller
 public class PrzedmiotController {
@@ -19,7 +21,9 @@ public class PrzedmiotController {
 
     public PrzedmiotController(PrzedmiotRepository przedmiotRepository) {
         this.przedmiotRepository = przedmiotRepository;
+
     }
+
     @PostMapping("/przedmioty")
     @ResponseBody
     public ResponseEntity<Map<String, String>> dodajPrzedmiot(@RequestBody Map<String, Object> danePrzedmiotu) {
@@ -31,7 +35,7 @@ public class PrzedmiotController {
         }
 
         Przedmiot przedmiot = new Przedmiot(nazwa);
-        Map<String, Object> cechy = (Map<String, Object>) danePrzedmiotu.get("cechy");
+        Map<String, String> cechy = (Map<String, String>) danePrzedmiotu.get("cechy");
         if (cechy != null) {
             przedmiot.setCechy(cechy);
         }
@@ -42,7 +46,6 @@ public class PrzedmiotController {
         result.put("nazwa", zapisanyPrzedmiot.getNazwa());
         return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
-
 
     @GetMapping("/dodaj-przedmiot")
     public String pokazFormularzDodawania() {
@@ -56,20 +59,28 @@ public class PrzedmiotController {
         return "wyswietl-przedmioty";
     }
 
+    @GetMapping("/wyszukaj")
+    public String search(@RequestParam String nazwaCechy,
+                         @RequestParam @Nullable String wartoscCechy,
+                         Model model) {
+        List<Przedmiot> przedmioty;
+        if(wartoscCechy!=null  && !wartoscCechy.isEmpty()) {
 
-    @GetMapping("/wyszukaj-po-cesze")
-    public String wyszukajPoCechie(@RequestParam String nazwaCechy, Model model) {
-        List<Przedmiot> przedmioty = przedmiotRepository.znajdzPrzedmiotyPoCechie(nazwaCechy);
+            przedmioty= przedmiotRepository.findByCechyNazwaAndCechyWartosc(nazwaCechy, wartoscCechy);
+            model.addAttribute("wyszukiwanieInfo", "Wyniki wyszukiwania dla cechy: " + nazwaCechy + " o wartości: " + wartoscCechy);
+        }
+        else {
+            przedmioty = przedmiotRepository.findByCechyNazwaExists(nazwaCechy);
+            model.addAttribute("wyszukiwanieInfo", "Wyniki wyszukiwania dla cechy: " + nazwaCechy);
+        }
         model.addAttribute("przedmioty", przedmioty);
-        model.addAttribute("wyszukiwanieInfo", "Wyniki wyszukiwania dla cechy: " + nazwaCechy);
         return "wyswietl-przedmioty";
     }
 
-    @GetMapping("/wyszukaj-po-cesze-wartosc")
-    public String wyszukajPoCechieWartosc(@RequestParam String nazwaCechy, @RequestParam String wartoscCechy, Model model) {
-        List<Przedmiot> przedmioty = przedmiotRepository.znajdzPrzedmiotyPoCechieWartosc(nazwaCechy, wartoscCechy);
-        model.addAttribute("przedmioty", przedmioty);
-        model.addAttribute("wyszukiwanieInfo", "Wyniki wyszukiwania dla cechy: " + nazwaCechy + " o wartości: " + wartoscCechy);
-        return "wyswietl-przedmioty";
+    @PostMapping("/przedmioty/delete/{id}")
+    public String usunPrzedmiot(@PathVariable String id) {
+        przedmiotRepository.deleteById(id);
+        return "redirect:/wyswietl-przedmioty";
     }
+
 }

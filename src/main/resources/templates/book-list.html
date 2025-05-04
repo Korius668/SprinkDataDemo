@@ -63,20 +63,6 @@
     </ul>
 </div>
 
-<!-- 🔎 Filter/Search -->
-<!--<form method="get" th:action="@{/books/search}" class="mb-4">-->
-<!--    <div class="row g-2">-->
-<!--        <div class="col">-->
-<!--            <input name="author" class="form-control" placeholder="Author"/>-->
-<!--        </div>-->
-<!--        <div class="col">-->
-<!--            <input name="publicationYear" type="number" class="form-control" placeholder="Year"/>-->
-<!--        </div>-->
-<!--        <div class="col-auto">-->
-<!--            <button class="btn btn-primary">Search</button>-->
-<!--        </div>-->
-<!--    </div>-->
-<!--</form>-->
 
 <form method="get" th:action="@{/books/search}" class="mb-4">
     <div class="row g-2 align-items-center">
@@ -97,9 +83,8 @@
     </div>
 </form>
 
-<!-- 📋 Book Table -->
 <table class="table table-bordered">
-    <thead><tr><th>Title</th><th>Author</th><th>Year</th><th>Actions</th></tr></thead>
+    <thead><tr><th>Tytuł</th><th>Autor</th><th>Rok</th><th>Akcje</th></tr></thead>
     <tbody>
     <tr th:each="book : ${books}">
         <td th:text="${book.title}"></td>

@@ -5,16 +5,13 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
 import java.util.List;
-import java.util.Map;
 
 public interface PrzedmiotRepository extends MongoRepository<Przedmiot, String> {
 
-    @Query(value = "{ 'cechy.?0' : { $exists: true } }", fields = "{ 'nazwa': 1, 'cechy.?0': 1 }")
-    List<Przedmiot> znajdzPrzedmiotyPoCechie(String nazwaCechy);
 
-    @Query(value = "{ 'cechy.?0' : ?1 }", fields = "{ 'nazwa': 1, 'cechy.?0': 1 }")
-    List<Przedmiot> znajdzPrzedmiotyPoCechieWartosc(String nazwaCechy, Object wartoscCechy);
+    @Query("{ 'cechy.?0': { '$exists': true } }")
+    List<Przedmiot> findByCechyNazwaExists(String nazwaCechy);
 
-    @Query("{ 'cechy.?0': { $exists: true } }")
-    List<Przedmiot> znajdzPrzedmiotyPosiadajaceCeche(String nazwaCechy);
+    @Query("{ 'cechy.?0': ?1 }")
+    List<Przedmiot> findByCechyNazwaAndCechyWartosc(String nazwaCechy, String wartoscCechy);
 }

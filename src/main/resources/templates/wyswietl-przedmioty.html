@@ -39,23 +39,8 @@
         </p>
     </div>
 
-
-    <div class="mb-3 p-3 border bg-light rounded">
-        <h2>Wyszukaj przedmioty po cesze</h2>
-        <form th:action="@{/wyszukaj-po-cesze}" method="get" class="row g-3 align-items-center">
-            <div class="col-auto">
-                <label for="nazwaCechy" class="form-label">Nazwa cechy:</label>
-            </div>
-            <div class="col-auto">
-                <input type="text" class="form-control" id="nazwaCechy" name="nazwaCechy" required>
-            </div>
-            <div class="col-auto">
-                <button type="submit" class="btn btn-primary">Wyszukaj</button>
-            </div>
-        </form>
-
-        <h2 class="mt-3">Wyszukaj przedmioty po cesze i wartości</h2>
-        <form th:action="@{/wyszukaj-po-cesze-wartosc}" method="get" class="row g-3 align-items-center">
+        <h2 class="mt-3">Wyszukaj przedmioty</h2>
+        <form th:action="@{/wyszukaj}" method="get" class="row g-3 align-items-center">
             <div class="col-auto">
                 <label for="nazwaCechyWartosc" class="form-label">Nazwa cechy:</label>
             </div>
@@ -66,7 +51,7 @@
                 <label for="wartoscCechy" class="form-label">Wartość cechy:</label>
             </div>
             <div class="col-auto">
-                <input type="text" class="form-control" id="wartoscCechy" name="wartoscCechy" required>
+                <input type="text" class="form-control" id="wartoscCechy" name="wartoscCechy">
             </div>
             <div class="col-auto">
                 <button type="submit" class="btn btn-success">Wyszukaj</button>
@@ -76,14 +61,8 @@
 
     <h2 th:if="${wyszukiwanieInfo}" th:text="${wyszukiwanieInfo}"></h2>
 
-    <table class="table table-striped">
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>Nazwa</th>
-            <th>Cechy</th>
-        </tr>
-        </thead>
+    <table class="table table-bordered">
+        <thead><tr><th>ID</th><th>Nazwa</th><th>Cechy</th><th>Akcje</th></tr></thead>
         <tbody>
         <tr th:each="przedmiot : ${przedmioty}">
             <td th:text="${przedmiot.id}"></td>
@@ -93,6 +72,11 @@
                     <li th:each="cecha : ${przedmiot.cechy}" th:text="${cecha.key + ': ' + cecha.value}"></li>
                 </ul>
                 <p th:if="${#maps.isEmpty(przedmiot.cechy)}">Brak cech.</p>
+            </td>
+            <td>
+                <form th:action="@{'/przedmioty/delete/' + ${przedmiot.id}}" method="post">
+                    <button type="submit" class="btn btn-danger btn-sm">Usuń</button>
+                </form>
             </td>
         </tr>
         <tr th:if="${#lists.isEmpty(przedmioty)}">

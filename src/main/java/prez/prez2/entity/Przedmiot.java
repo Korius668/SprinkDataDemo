@@ -12,7 +12,7 @@ public class Przedmiot {
     @Id
     private String id;
     private String nazwa;
-    private Map<String, Object> cechy = new HashMap<>();
+    private Map<String, String> cechy = new HashMap<>();
 
     public Przedmiot() {
     }
@@ -37,15 +37,15 @@ public class Przedmiot {
         this.nazwa = nazwa;
     }
 
-    public Map<String, Object> getCechy() {
+    public Map<String, String> getCechy() {
         return cechy;
     }
 
-    public void setCechy(Map<String, Object> cechy) {
+    public void setCechy(Map<String, String> cechy) {
         this.cechy = cechy;
     }
 
-    public void dodajCeche(String klucz, Object wartosc) {
+    public void dodajCeche(String klucz, String wartosc) {
         this.cechy.put(klucz, wartosc);
     }
 }
